@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
     "@monaco-editor/react": "^4.6.0",
     "@prisma/client": "^6.1.0",
     "@radix-ui/react-dialog": "^1.1.4",
