@@ -1,4 +1,5 @@
 import { ModeToggle } from "@/components/mode-toggle";
+import { SearchBar } from "@/components/search-bar";
 
 export default function Home() {
   return (
@@ -6,6 +7,8 @@ export default function Home() {
       <ModeToggle />
 
       <h1>Home</h1>
+
+      <SearchBar />
     </div>
   );
 }
