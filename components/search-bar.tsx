@@ -32,7 +32,7 @@ export function SearchBar() {
       <Input
         type="search"
         placeholder="Search snippets..."
-        className="w-full"
+        className="w-full pl-10 h-12 text-lg bg-background"
         onChange={(e) => debouncedSearch(e.target.value)}
         defaultValue={searchParams.get("search") ?? ""}
       />

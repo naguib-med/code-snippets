@@ -4,25 +4,39 @@ import { SnippetCard } from "./snippet-card";
 export async function SnippetsList({
   searchParams,
 }: {
-  searchParams?: { search?: string };
+  searchParams?: { search?: string; tag?: string };
 }) {
   const snippets = await prisma.snippet.findMany({
-    where: searchParams?.search
-      ? {
-          OR: [
-            { title: { contains: searchParams.search, mode: "insensitive" } },
-            {
-              description: {
-                contains: searchParams.search,
-                mode: "insensitive",
-              },
-            },
-            {
-              language: { contains: searchParams.search, mode: "insensitive" },
-            },
-          ],
-        }
-      : undefined,
+    where: {
+      AND: [
+        searchParams?.search
+          ? {
+              OR: [
+                {
+                  title: { contains: searchParams.search, mode: "insensitive" },
+                },
+                {
+                  description: {
+                    contains: searchParams.search,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  language: {
+                    contains: searchParams.search,
+                    mode: "insensitive",
+                  },
+                },
+              ],
+            }
+          : {},
+        searchParams?.tag
+          ? {
+              tags: { has: searchParams.tag },
+            }
+          : {},
+      ],
+    },
     orderBy: { createdAt: "desc" },
   });
 
