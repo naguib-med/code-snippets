@@ -9,4 +9,5 @@ export const snippetSchema = z.object({
     SUPPORTED_LANGUAGES[0].value,
     ...SUPPORTED_LANGUAGES.slice(1).map((l) => l.value),
   ]),
+  tags: z.array(z.string()).default([]),
 });

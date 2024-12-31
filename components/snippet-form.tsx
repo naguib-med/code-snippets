@@ -11,38 +11,50 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CodeEditor } from "@/components/code-editor";
 import { LanguageSelect } from "@/components/language-select";
+import { TagInput } from "@/components/tag-input";
 import type { SnippetFormData } from "@/lib/types";
+import type { Snippet } from "@prisma/client";
 
-export function SnippetForm() {
+interface SnippetFormProps {
+  snippet?: Snippet;
+}
+
+export function SnippetForm({ snippet }: SnippetFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<SnippetFormData>({
     resolver: zodResolver(snippetSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      content: "",
-      language: "javascript",
+      title: snippet?.title ?? "",
+      description: snippet?.description ?? "",
+      content: snippet?.content ?? "",
+      language: snippet?.language ?? "javascript",
+      tags: snippet?.tags ?? [],
     },
   });
 
   async function onSubmit(data: SnippetFormData) {
     try {
       setIsSubmitting(true);
-      const response = await fetch("/api/snippets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        snippet ? `/api/snippets/${snippet.id}` : "/api/snippets",
+        {
+          method: snippet ? "PATCH" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        }
+      );
 
-      if (!response.ok) throw new Error("Failed to create snippet");
+      if (!response.ok) throw new Error("Failed to save snippet");
 
-      toast.success("Snippet created successfully");
+      toast.success(snippet ? "Snippet updated" : "Snippet created");
       router.push("/");
       router.refresh();
     } catch (error) {
-      toast.error("Failed to create snippet");
+      toast.error(
+        snippet ? "Failed to update snippet" : "Failed to create snippet"
+      );
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -59,7 +71,7 @@ export function SnippetForm() {
           placeholder="Enter snippet title"
         />
         {form.formState.errors.title && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {form.formState.errors.title.message}
           </p>
         )}
@@ -73,7 +85,7 @@ export function SnippetForm() {
           placeholder="Enter snippet description"
         />
         {form.formState.errors.description && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {form.formState.errors.description.message}
           </p>
         )}
@@ -88,6 +100,14 @@ export function SnippetForm() {
       </div>
 
       <div className="space-y-2">
+        <Label>Tags</Label>
+        <TagInput
+          tags={form.watch("tags")}
+          onChange={(tags) => form.setValue("tags", tags)}
+        />
+      </div>
+
+      <div className="space-y-2">
         <Label>Code</Label>
         <div className="border rounded-md">
           <CodeEditor
@@ -97,14 +117,20 @@ export function SnippetForm() {
           />
         </div>
         {form.formState.errors.content && (
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-destructive">
             {form.formState.errors.content.message}
           </p>
         )}
       </div>
 
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create Snippet"}
+        {isSubmitting
+          ? snippet
+            ? "Updating..."
+            : "Creating..."
+          : snippet
+          ? "Update"
+          : "Create"}
       </Button>
     </form>
   );
