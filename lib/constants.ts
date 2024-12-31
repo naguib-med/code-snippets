@@ -15,3 +15,5 @@ export const SUPPORTED_LANGUAGES = [
   { value: "yaml", label: "YAML" },
   { value: "markdown", label: "Markdown" },
 ] as const;
+
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]["value"];

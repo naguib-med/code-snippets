@@ -14,6 +14,7 @@ import { LanguageSelect } from "@/components/language-select";
 import { TagInput } from "@/components/tag-input";
 import type { SnippetFormData } from "@/lib/types";
 import type { Snippet } from "@prisma/client";
+import type { SupportedLanguage } from "@/lib/constants";
 
 interface SnippetFormProps {
   snippet?: Snippet;
@@ -29,7 +30,7 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
       title: snippet?.title ?? "",
       description: snippet?.description ?? "",
       content: snippet?.content ?? "",
-      language: snippet?.language ?? "javascript",
+      language: (snippet?.language as SupportedLanguage) ?? "javascript",
       tags: snippet?.tags ?? [],
     },
   });
