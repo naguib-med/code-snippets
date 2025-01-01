@@ -5,12 +5,15 @@ import { SnippetForm } from "@/components/snippet-form";
 import { SnippetSkeleton } from "@/components/snippet-skeleton";
 import { ErrorBoundary } from "@/components/error-boundary";
 
+interface EditSnippetPageProps {
+  params: Promise<{ id: string }>;
+}
+
 export default async function EditSnippetPage({
   params,
-}: {
-  params: { id: string };
-}) {
-  const snippet = await getSnippet(params.id);
+}: EditSnippetPageProps) {
+  const resolvedParams = await params;
+  const snippet = await getSnippet(resolvedParams.id);
 
   if (!snippet) {
     notFound();
