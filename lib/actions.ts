@@ -2,7 +2,6 @@
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { startOfWeek } from "date-fns";
 import type { SnippetFormData } from "./types";
 
 export async function getSnippets(search?: string, tag?: string) {
@@ -35,30 +34,38 @@ export async function getSnippets(search?: string, tag?: string) {
 }
 
 export async function getSnippetsStats() {
-  const [totalSnippets, languages, tags, snippetsThisWeek] = await Promise.all([
-    prisma.snippet.count(),
-    prisma.snippet.findMany({
-      select: { language: true },
-      distinct: ["language"],
-    }),
-    prisma.snippet.findMany({ select: { tags: true } }),
-    prisma.snippet.count({
-      where: {
-        createdAt: {
-          gte: startOfWeek(new Date()),
+  try {
+    const [snippets, languages, tags, recentSnippets] = await Promise.all([
+      prisma.snippet.count(),
+      prisma.snippet.findMany({
+        select: { language: true },
+        distinct: ["language"],
+      }),
+      prisma.snippet.findMany({ select: { tags: true } }),
+      prisma.snippet.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          },
         },
-      },
-    }),
-  ]);
+      }),
+    ]);
 
-  const uniqueTags = new Set(tags.flatMap((s) => s.tags));
-
-  return {
-    totalSnippets,
-    totalLanguages: languages.length,
-    totalTags: uniqueTags.size,
-    snippetsThisWeek,
-  };
+    return {
+      totalSnippets: snippets,
+      totalLanguages: languages.length,
+      totalTags: [...new Set(tags.flatMap((s) => s.tags))].length,
+      snippetsThisWeek: recentSnippets,
+    };
+  } catch (error) {
+    console.error("Failed to fetch stats:", error);
+    return {
+      totalSnippets: 0,
+      totalLanguages: 0,
+      totalTags: 0,
+      snippetsThisWeek: 0,
+    };
+  }
 }
 
 export async function getSnippet(id: string) {

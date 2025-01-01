@@ -22,8 +22,7 @@ export default async function Home({
   ]);
 
   return (
-    <main>
-      {/* Hero Section with animated gradient */}
+    <div>
       <div className="relative bg-gradient-to-b from-primary/10 via-background to-background overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,black)]" />
         <div className="container mx-auto py-16 relative">
@@ -48,7 +47,6 @@ export default async function Home({
             </div>
           </div>
 
-          {/* Search Section with floating animation */}
           <div className="max-w-2xl mx-auto animate-float">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
@@ -58,16 +56,13 @@ export default async function Home({
         </div>
       </div>
 
-      {/* Stats Section */}
       <div className="border-y bg-muted/50">
         <div className="container mx-auto py-8">
           <Stats stats={stats} />
         </div>
       </div>
 
-      {/* Content Section */}
       <div className="container mx-auto py-12">
-        {/* Featured Section */}
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-6">
             <Sparkles className="h-5 w-5 text-primary" />
@@ -78,7 +73,6 @@ export default async function Home({
           </Suspense>
         </div>
 
-        {/* Tags Section */}
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-6">
             <Tag className="h-5 w-5 text-primary" />
@@ -87,7 +81,6 @@ export default async function Home({
           <TagCloud tags={tags} />
         </div>
 
-        {/* All Snippets */}
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-6">All Snippets</h2>
           <Suspense fallback={<SnippetsListSkeleton />}>
@@ -95,6 +88,6 @@ export default async function Home({
           </Suspense>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

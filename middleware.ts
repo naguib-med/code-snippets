@@ -1,19 +1,43 @@
-import { auth } from "./auth";
+import { getToken } from "next-auth/jwt";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
-  const isAuth = !!req.auth;
-  const isAuthPage = req.nextUrl.pathname.startsWith("/auth");
-  const isPublicPage = req.nextUrl.pathname === "/";
+export async function middleware(request: NextRequest) {
+  const token = await getToken({ req: request });
+  const isAuthenticated = !!token;
 
-  if (isAuthPage && isAuth) {
-    return Response.redirect(new URL("/", req.nextUrl));
+  // Public paths that don't require authentication
+  const publicPaths = [
+    "/",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+    "/404",
+    "/snippets",
+  ];
+  const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
+
+  if (isPublicPath && isAuthenticated) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  if (!isAuth && !isPublicPage && !isAuthPage) {
-    return Response.redirect(new URL("/auth/signin", req.nextUrl));
+  if (!isPublicPath && !isAuthenticated) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
 };
