@@ -3,13 +3,16 @@ import { prisma } from "@/lib/db";
 import { snippetSchema } from "@/lib/validations";
 import { notFound } from "next/navigation";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+interface RouteContext {
+  params: {
+    id: string;
+  };
+}
+
+export async function GET(request: NextRequest, context: RouteContext) {
   try {
     const snippet = await prisma.snippet.findUnique({
-      where: { id: params.id },
+      where: { id: context.params.id },
     });
 
     if (!snippet) {
@@ -28,16 +31,13 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const json = await request.json();
     const body = snippetSchema.partial().parse(json);
 
     const snippet = await prisma.snippet.update({
-      where: { id: params.id },
+      where: { id: context.params.id },
       data: body,
     });
 
@@ -53,13 +53,10 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, context: RouteContext) {
   try {
     await prisma.snippet.delete({
-      where: { id: params.id },
+      where: { id: context.params.id },
     });
 
     return new NextResponse(null, { status: 204 });
