@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Home, User } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
+import { UserNav } from "@/components/auth/user-nav";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const routes = [
     {
@@ -45,12 +48,16 @@ export default function Navbar() {
 
         <div className="flex items-center space-x-4">
           <ModeToggle />
-          <Button variant="outline" size="sm" asChild>
-            <Link href="/login">
-              <User className="h-4 w-4 mr-2" />
-              Login
-            </Link>
-          </Button>
+          {session ? (
+            <UserNav user={session.user} />
+          ) : (
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/auth/signin">
+                <User className="h-4 w-4 mr-2" />
+                Login
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </nav>

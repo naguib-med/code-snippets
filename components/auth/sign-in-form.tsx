@@ -14,6 +14,12 @@ export function SignInForm() {
         <Github className="mr-2 h-4 w-4" />
         Continue with GitHub
       </Button>
+      <Button
+        variant="outline"
+        onClick={() => signIn("google", { callbackUrl: "/" })}
+      >
+        Continue with Google
+      </Button>
     </div>
   );
 }

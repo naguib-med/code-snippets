@@ -8,9 +8,8 @@ export async function middleware(request: NextRequest) {
 
   // Public paths that don't require authentication
   const publicPaths = [
-    "/",
-    "/login",
-    "/register",
+    "/auth/signin",
+    "/auth/signout",
     "/forgot-password",
     "/reset-password",
     "/404",
@@ -19,11 +18,11 @@ export async function middleware(request: NextRequest) {
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
 
   if (isPublicPath && isAuthenticated) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   if (!isPublicPath && !isAuthenticated) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 
   return NextResponse.next();
