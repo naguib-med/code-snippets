@@ -1,9 +1,7 @@
 import NextAuth from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]";
 
-export const {
-  auth,
-  handlers: { GET, POST },
-} = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };
 
 export type { Session } from "next-auth";

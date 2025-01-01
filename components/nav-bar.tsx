@@ -1,29 +1,58 @@
-import Link from "next/link";
-import { auth } from "@/auth";
-import { Button } from "@/components/ui/button";
-import { UserNav } from "@/components/auth/user-nav";
+"use client";
 
-export async function NavBar() {
-  const session = await auth();
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Home, User } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
+
+export default function Navbar() {
+  const pathname = usePathname();
+
+  const routes = [
+    {
+      href: "/",
+      label: "Home",
+      icon: Home,
+      active: pathname === "/",
+    },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold">Code Snippets</span>
-          </Link>
+    <nav className="border-b">
+      <div className="flex h-16 items-center px-4 max-w-7xl mx-auto">
+        <Link href="/" className="flex items-center font-bold text-xl mr-6">
+          Snippets
+        </Link>
+
+        <div className="flex items-center space-x-4 flex-1">
+          {routes.map((route) => (
+            <Link
+              key={route.href}
+              href={route.href}
+              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors
+                ${
+                  route.active
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                }`}
+            >
+              <route.icon className="h-4 w-4 mr-2" />
+              {route.label}
+            </Link>
+          ))}
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          {session?.user ? (
-            <UserNav user={session.user} />
-          ) : (
-            <Button asChild variant="secondary" size="sm">
-              <Link href="/auth/signin">Sign In</Link>
-            </Button>
-          )}
+
+        <div className="flex items-center space-x-4">
+          <ModeToggle />
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/login">
+              <User className="h-4 w-4 mr-2" />
+              Login
+            </Link>
+          </Button>
         </div>
       </div>
-    </header>
+    </nav>
   );
 }
