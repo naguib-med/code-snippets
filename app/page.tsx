@@ -11,14 +11,18 @@ import { FeaturedSnippetsSkeleton } from "@/components/featured-snippets/skeleto
 import { FeaturedSnippets } from "@/components/featured-snippets/index";
 import { SnippetsListSkeleton } from "@/components/snippets-list/skeleton";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams?: { search?: string; tag?: string };
-}) {
-  const [tags, stats] = await Promise.all([
+interface HomeProps {
+  searchParams?: Promise<{
+    search?: string;
+    tag?: string;
+  }>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const [tags, stats, params] = await Promise.all([
     getPopularTags(),
     getSnippetsStats(),
+    searchParams,
   ]);
 
   return (
@@ -84,7 +88,7 @@ export default async function Home({
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-6">All Snippets</h2>
           <Suspense fallback={<SnippetsListSkeleton />}>
-            <SnippetsList searchParams={searchParams} />
+            <SnippetsList searchParams={params} />
           </Suspense>
         </div>
       </div>
