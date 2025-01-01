@@ -96,7 +96,9 @@ export function SnippetForm({ snippet }: SnippetFormProps) {
         <Label>Language</Label>
         <LanguageSelect
           value={form.watch("language")}
-          onValueChange={(value) => form.setValue("language", value)}
+          onValueChange={(value: SupportedLanguage) =>
+            form.setValue("language", value)
+          }
         />
       </div>
 

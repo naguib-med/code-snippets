@@ -7,11 +7,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SUPPORTED_LANGUAGES } from "@/lib/constants";
+import { SUPPORTED_LANGUAGES, type SupportedLanguage } from "@/lib/constants";
 
 interface LanguageSelectProps {
-  value: string;
-  onValueChange: (value: string) => void;
+  value: SupportedLanguage;
+  onValueChange: (value: SupportedLanguage) => void;
 }
 
 export function LanguageSelect({ value, onValueChange }: LanguageSelectProps) {
@@ -21,9 +21,9 @@ export function LanguageSelect({ value, onValueChange }: LanguageSelectProps) {
         <SelectValue placeholder="Select language" />
       </SelectTrigger>
       <SelectContent>
-        {SUPPORTED_LANGUAGES.map((lang) => (
-          <SelectItem key={lang.value} value={lang.value}>
-            {lang.label}
+        {SUPPORTED_LANGUAGES.map((language) => (
+          <SelectItem key={language.value} value={language.value}>
+            {language.label}
           </SelectItem>
         ))}
       </SelectContent>
