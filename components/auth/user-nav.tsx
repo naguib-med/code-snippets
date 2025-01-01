@@ -8,10 +8,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
-import type { User } from "next-auth";
 
 interface UserNavProps {
-  user: User;
+  user: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    id?: string;
+  };
 }
 
 export function UserNav({ user }: UserNavProps) {
