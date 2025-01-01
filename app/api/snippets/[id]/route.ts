@@ -1,15 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { snippetSchema } from "@/lib/validations";
 import { notFound } from "next/navigation";
 
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
-
-export async function GET(request: NextRequest, context: RouteContext) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
     const snippet = await prisma.snippet.findUnique({
       where: { id: context.params.id },
@@ -31,9 +29,12 @@ export async function GET(request: NextRequest, context: RouteContext) {
   }
 }
 
-export async function PATCH(request: NextRequest, context: RouteContext) {
+export async function PATCH(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
-    const json = await request.json();
+    const json = await req.json();
     const body = snippetSchema.partial().parse(json);
 
     const snippet = await prisma.snippet.update({
@@ -53,7 +54,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   }
 }
 
-export async function DELETE(request: NextRequest, context: RouteContext) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
     await prisma.snippet.delete({
       where: { id: context.params.id },
