@@ -6,11 +6,11 @@ import { notFound } from "next/navigation";
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const snippet = await prisma.snippet.findUnique({
-      where: { id: context.params.id },
+      where: { id: (await params).id },
     });
 
     if (!snippet) {
@@ -31,14 +31,14 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const json = await req.json();
     const body = snippetSchema.partial().parse(json);
 
     const snippet = await prisma.snippet.update({
-      where: { id: context.params.id },
+      where: { id: (await params).id },
       data: body,
     });
 
@@ -56,11 +56,11 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await prisma.snippet.delete({
-      where: { id: context.params.id },
+      where: { id: (await params).id },
     });
 
     return new NextResponse(null, { status: 204 });
