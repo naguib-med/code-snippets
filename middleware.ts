@@ -1,42 +1,26 @@
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/auth";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request });
-  const isAuthenticated = !!token;
+// List of routes that require authentication
+const protectedRoutes = ["/dashboard", "/account"];
 
-  // Public paths that don't require authentication
-  const publicPaths = [
-    "/auth/signin",
-    "/auth/signout",
-    "/forgot-password",
-    "/reset-password",
-    "/404",
-    "/snippets",
-  ];
-  const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
+console.log(protectedRoutes);
 
-  if (isPublicPath && isAuthenticated) {
-    return NextResponse.redirect(new URL("/", request.url));
+export default auth((req) => {
+  const isLoggedIn = !!req.auth;
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    req.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isProtectedRoute && !isLoggedIn) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
-  if (!isPublicPath && !isAuthenticated) {
-    return NextResponse.redirect(new URL("/auth/signin", request.url));
-  }
-
+  // Allow the request to proceed
   return NextResponse.next();
-}
+});
 
+// This line configures which routes the middleware should run on
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
