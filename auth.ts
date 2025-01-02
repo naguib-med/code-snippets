@@ -37,6 +37,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return {
         ...session,
         accessToken: token.accessToken as string,
+        user: {
+          ...session.user,
+          id: token.sub,
+        },
       };
     },
     async jwt({ token }): Promise<JWT> {

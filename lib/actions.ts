@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import type { SnippetFormData } from "./types";
+import { auth } from "@/auth";
 
 export async function getSnippets(search?: string, tag?: string) {
   try {
@@ -186,8 +187,10 @@ export async function updateProfile(
 }
 
 export async function deleteAccount() {
-  // This will cascade delete all user data due to the prisma schema relations
+  const session = await auth();
+  if (!session?.user?.id) return null;
+
   await prisma.user.delete({
-    where: { id: "current-user-id" }, // Replace with actual user ID from session
+    where: { id: session.user.id },
   });
 }

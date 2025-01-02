@@ -14,21 +14,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import { deleteAccount } from "@/lib/actions";
+import { signOut } from "next-auth/react";
 
 export function DeleteAccount() {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleDelete() {
     try {
       setIsLoading(true);
       await deleteAccount();
-      toast.success("Account deleted successfully");
-      router.push("/");
+      signOut({ callbackUrl: "/" });
     } catch (error) {
-      toast.error("Failed to delete account");
+      if (error instanceof Error) {
+        console.error(`Failed to delete account: ${error.message}`);
+      }
     } finally {
       setIsLoading(false);
     }
