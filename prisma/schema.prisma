@@ -20,7 +20,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -30,7 +30,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Snippet {
@@ -40,14 +40,17 @@ model Snippet {
   content     String
   language    String
   tags        String[]
+  featured    Boolean  @default(false)
+  shareToken  String?  @unique
+  isPublic    Boolean  @default(false)
   createdAt   DateTime @default(now())
-  updatedAt   DateTime  @updatedAt
-  userId      String?
-  User        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shareToken  String?          @unique
-  isPublic    Boolean         @default(false)
-  versions    SnippetVersion[]
+  updatedAt   DateTime @updatedAt
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   favorites   Favorite[]
+  versions    SnippetVersion[]
+  views       SnippetView[]
+  collections CollectionSnippet[]
 
   @@index([language])
   @@index([tags])
@@ -60,30 +63,72 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  Account       Account[]
-  Session       Session[]
-  Snippet       Snippet[]
-  snippetVersions SnippetVersion[]
-  favorites       Favorite[]
+  accounts      Account[]
+  sessions      Session[]
+  snippets      Snippet[]
+  collections   Collection[]
+  favorites     Favorite[]
+  versions      SnippetVersion[]
 }
 
 model SnippetVersion {
- id        String   @id @default(cuid())
- snippetId String
- userId    String
- content   String
- createdAt DateTime @default(now())
- snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
- user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  snippetId String
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([snippetId])
 }
 
 model Favorite {
- id        String   @id @default(cuid())
- userId    String
- snippetId String
- createdAt DateTime @default(now())
- snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
- user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  userId    String
+  snippetId String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
 
- @@unique([userId, snippetId])
+  @@unique([userId, snippetId])
+  @@index([userId])
+  @@index([snippetId])
+}
+
+
+model Collection {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  snippets    CollectionSnippet[]
+
+  @@index([userId])
+}
+
+model CollectionSnippet {
+  id           String     @id @default(cuid())
+  collectionId String
+  snippetId    String
+  addedAt      DateTime   @default(now())
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  snippet      Snippet    @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, snippetId])
+  @@index([collectionId])
+  @@index([snippetId])
+}
+
+model SnippetView {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  snippetId String
+  snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+
+  @@index([snippetId])
+  @@index([createdAt])
 }

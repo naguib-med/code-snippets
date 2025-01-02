@@ -27,7 +27,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(snippet, { status: 201 });
   } catch (error) {
-    console.error("Failed to create snippet:", error);
+    if (error instanceof Error) {
+      console.error("Failed to create snippet:", error.message);
+    }
     return NextResponse.json(
       { error: "Failed to create snippet" },
       { status: 500 }

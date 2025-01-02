@@ -1,41 +1,65 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { ProfileHeader } from "@/components/profile/profile-header";
+import { ActivityFeed } from "@/components/profile/activity-feed";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { DeleteAccount } from "@/components/profile/delete-account";
-import { getUserSnippets } from "@/lib/actions";
-import { UserSnippetCard } from "@/components/profile/user-snippet-card";
+import { UserSnippets } from "@/components/profile/user-snippets";
+import {
+  getUserStats,
+  getUserActivity,
+  getUserSnippets,
+} from "@/lib/actions/profile";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user) redirect("/auth/signin");
 
-  const snippets = await getUserSnippets(session?.user?.id as string);
+  const [stats, activities, snippets] = await Promise.all([
+    getUserStats(session.user.id),
+    getUserActivity(session.user.id),
+    getUserSnippets(session.user.id),
+  ]);
 
   return (
-    <div className="container py-10">
-      <h1 className="text-4xl font-bold mb-8">Profile</h1>
-      <div className="grid gap-8 md:grid-cols-2">
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Account Settings</h2>
-          <ProfileForm user={session.user} />
-          <div className="mt-8">
-            <DeleteAccount />
-          </div>
-        </div>
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Your Snippets</h2>
-          <div className="space-y-4">
-            {snippets.length === 0 ? (
-              <p className="text-muted-foreground">
-                You haven&apos;t created any snippets yet.
-              </p>
-            ) : (
-              snippets.map((snippet) => (
-                <UserSnippetCard key={snippet.id} snippet={snippet} />
-              ))
-            )}
-          </div>
-        </div>
+    <div className="min-h-screen pb-10">
+      <ProfileHeader user={session.user} stats={stats} />
+
+      <div className="container mt-8">
+        <Tabs defaultValue="snippets">
+          <TabsList>
+            <TabsTrigger value="snippets">My Snippets</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="snippets" className="mt-6">
+            <UserSnippets snippets={snippets} />
+          </TabsContent>
+
+          <TabsContent value="activity" className="mt-6">
+            <ActivityFeed activities={activities} />
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-6">
+            <div className="max-w-2xl">
+              <div className="space-y-8">
+                <div>
+                  <h2 className="text-2xl font-semibold mb-4">
+                    Profile Settings
+                  </h2>
+                  <ProfileForm user={session.user} />
+                </div>
+
+                <div>
+                  <h2 className="text-2xl font-semibold mb-4">Danger Zone</h2>
+                  <DeleteAccount />
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

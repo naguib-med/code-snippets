@@ -11,20 +11,29 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { VersionDiff } from "@/components/snippets/version-diff";
 import { getSnippetHistory } from "@/lib/actions/history";
 import { formatDistanceToNow } from "date-fns";
+import type { SnippetVersion } from "@prisma/client";
 
 interface HistoryDialogProps {
   snippetId: string;
 }
 
 export function HistoryDialog({ snippetId }: HistoryDialogProps) {
-  const [versions, setVersions] = useState([]);
+  const [versions, setVersions] = useState<SnippetVersion[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadHistory = async () => {
-      const history = await getSnippetHistory(snippetId);
-      setVersions(history);
+      try {
+        const history = await getSnippetHistory(snippetId);
+        setVersions(history);
+      } catch (error) {
+        console.error("Failed to load history:", error);
+      } finally {
+        setLoading(false);
+      }
     };
     loadHistory();
   }, [snippetId]);
@@ -37,33 +46,48 @@ export function HistoryDialog({ snippetId }: HistoryDialogProps) {
           History
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Version History</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[400px] mt-4">
-          <div className="space-y-4">
-            {versions.map((version) => (
-              <div
-                key={version.id}
-                className="p-4 rounded-lg border bg-muted/50"
-              >
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm font-medium">
-                    {version.user.name}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    {formatDistanceToNow(new Date(version.createdAt), {
-                      addSuffix: true,
-                    })}
-                  </span>
+        <ScrollArea className="h-[600px] mt-4">
+          {loading ? (
+            <div className="flex items-center justify-center h-32">
+              <span className="text-muted-foreground">Loading history...</span>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {versions.map((version, index) => (
+                <div
+                  key={version.id}
+                  className="p-4 rounded-lg border bg-muted/50"
+                >
+                  <div className="flex justify-between mb-4">
+                    <div>
+                      <span className="font-medium">
+                        {version.user?.name || "Anonymous"}
+                      </span>
+                      <span className="text-sm text-muted-foreground ml-2">
+                        {formatDistanceToNow(new Date(version.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      Version {versions.length - index}
+                    </span>
+                  </div>
+
+                  {index < versions.length - 1 && (
+                    <VersionDiff
+                      currentVersion={version}
+                      previousVersion={versions[index + 1]}
+                    />
+                  )}
                 </div>
-                <pre className="text-sm bg-background p-2 rounded">
-                  <code>{version.content}</code>
-                </pre>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </ScrollArea>
       </DialogContent>
     </Dialog>
