@@ -11,6 +11,8 @@ export async function POST(request: Request) {
   try {
     const json = await request.json();
     const body = snippetSchema.parse(json);
+    console.log("Creating snippet:", body);
+    console.log("User ID:", session.user.id);
 
     const snippet = await prisma.snippet.create({
       data: {
