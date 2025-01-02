@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -29,10 +28,11 @@ export function UserSnippetCard({ snippet }: UserSnippetCardProps) {
     try {
       setIsDeleting(true);
       await deleteSnippet(snippet.id);
-      toast.success("Snippet deleted successfully");
       router.refresh();
     } catch (error) {
-      toast.error("Failed to delete snippet");
+      if (error instanceof Error) {
+        console.error(`Failed to delete snippet: ${error.message}`);
+      }
     } finally {
       setIsDeleting(false);
     }

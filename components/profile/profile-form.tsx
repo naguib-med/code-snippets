@@ -30,10 +30,13 @@ export function ProfileForm({ user }: ProfileFormProps) {
   async function onSubmit(data: { name: string; email: string }) {
     try {
       setIsLoading(true);
-      await updateProfile(user.id, data);
+      await updateProfile(user.id as string, data);
       toast.success("Profile updated successfully");
       router.refresh();
     } catch (error) {
+      if (error instanceof Error) {
+        console.error(`Failed to update profile: ${error.message}`);
+      }
       toast.error("Failed to update profile");
     } finally {
       setIsLoading(false);
