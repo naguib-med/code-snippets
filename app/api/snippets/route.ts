@@ -19,11 +19,7 @@ export async function POST(request: Request) {
         content: body.content,
         language: body.language,
         tags: body.tags,
-        user: {
-          connect: {
-            id: session.user.id,
-          },
-        },
+        userId: session.user.id,
       },
     });
 
