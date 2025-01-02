@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Code2, Search, Tag, Sparkles } from "lucide-react";
-import { SnippetsList } from "@/components/snippets-list";
+import { SnippetsList } from "@/components/snippets/snippets-list";
 import { SearchBar } from "@/components/search-bar";
 import { TagCloud } from "@/components/tag-cloud";
 import { Stats } from "@/components/stats";

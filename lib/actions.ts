@@ -166,3 +166,28 @@ export async function getPopularTags() {
     return [];
   }
 }
+
+export async function getUserSnippets(userId: string) {
+  return prisma.snippet.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function updateProfile(
+  userId: string,
+  data: { name: string; email: string }
+) {
+  await prisma.user.update({
+    where: { id: userId },
+    data,
+  });
+  revalidatePath("/profile");
+}
+
+export async function deleteAccount() {
+  // This will cascade delete all user data due to the prisma schema relations
+  await prisma.user.delete({
+    where: { id: "current-user-id" }, // Replace with actual user ID from session
+  });
+}

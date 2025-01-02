@@ -11,3 +11,8 @@ export const snippetSchema = z.object({
   ]),
   tags: z.array(z.string()).default([]),
 });
+
+export const profileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").max(100),
+  email: z.string().email("Invalid email address"),
+});
