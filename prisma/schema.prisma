@@ -44,6 +44,10 @@ model Snippet {
   updatedAt   DateTime  @updatedAt
   userId      String?
   User        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shareToken  String?          @unique
+  isPublic    Boolean         @default(false)
+  versions    SnippetVersion[]
+  favorites   Favorite[]
 
   @@index([language])
   @@index([tags])
@@ -59,4 +63,27 @@ model User {
   Account       Account[]
   Session       Session[]
   Snippet       Snippet[]
+  snippetVersions SnippetVersion[]
+  favorites       Favorite[]
+}
+
+model SnippetVersion {
+ id        String   @id @default(cuid())
+ snippetId String
+ userId    String
+ content   String
+ createdAt DateTime @default(now())
+ snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Favorite {
+ id        String   @id @default(cuid())
+ userId    String
+ snippetId String
+ createdAt DateTime @default(now())
+ snippet   Snippet  @relation(fields: [snippetId], references: [id], onDelete: Cascade)
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+ @@unique([userId, snippetId])
 }
