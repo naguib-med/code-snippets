@@ -9,7 +9,7 @@ export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user) redirect("/auth/signin");
 
-  const snippets = await getUserSnippets(session.user.id);
+  const snippets = await getUserSnippets(session?.user?.id as string);
 
   return (
     <div className="container py-10">
@@ -27,7 +27,7 @@ export default async function ProfilePage() {
           <div className="space-y-4">
             {snippets.length === 0 ? (
               <p className="text-muted-foreground">
-                You haven't created any snippets yet.
+                You haven&apos;t created any snippets yet.
               </p>
             ) : (
               snippets.map((snippet) => (

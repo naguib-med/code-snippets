@@ -46,6 +46,9 @@ export function SnippetCard({ snippet, showActions = true }: SnippetCardProps) {
       toast.success("Snippet deleted successfully");
       router.refresh();
     } catch (error) {
+      if (error instanceof Error) {
+        console.error(`Failed to delete snippet: ${error.message}`);
+      }
       toast.error("Failed to delete snippet");
     } finally {
       setIsDeleting(false);
