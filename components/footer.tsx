@@ -36,48 +36,6 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/docs"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Documentation
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/api-docs"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  API
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/privacy"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/terms"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Terms of Service
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
             <h3 className="font-semibold mb-4">Connect</h3>
             <Link
               href="https://github.com"
