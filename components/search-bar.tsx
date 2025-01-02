@@ -28,7 +28,7 @@ export function SearchBar() {
   const debouncedSearch = debounce(handleSearch, 300);
 
   return (
-    <div className="w-full max-w-sm mb-8">
+    <div>
       <Input
         type="search"
         placeholder="Search snippets..."
